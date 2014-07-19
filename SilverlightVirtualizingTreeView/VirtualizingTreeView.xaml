@@ -5,21 +5,20 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:SilverlightVirtualizingTreeView" x:Class="SilverlightVirtualizingTreeView.VirtualizingTreeView"
     mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400">
-
-    <Grid x:Name="LayoutRoot" Background="White">
-        <ListBox x:Name="InnerListBox" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <local:VirtualizingTreeViewItem
+    d:DesignHeight="300" d:DesignWidth="400"
+    x:Name="TreeView" Padding="10">
+    <ListBox x:Name="InnerListBox" HorizontalAlignment="Stretch" Height="Auto" VerticalAlignment="Stretch" Width="Auto" 
+             Padding="{Binding Padding, ElementName=TreeView}">
+        <ListBox.ItemTemplate>
+            <DataTemplate>
+                <local:VirtualizingTreeViewItem
                         IsExpanded="{Binding Path=IsExpanded, Mode=TwoWay}" 
                         ExpanderVisibility="{Binding Path=ExpanderVisibility}" 
                         Text="{Binding Path=Text}" 
                         Indent="{Binding Path=Indent}"
                         HorizontalAlignment="Stretch" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
 
-    </Grid>
 </UserControl>

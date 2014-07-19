@@ -135,7 +135,7 @@ namespace SilverlightVirtualizingTreeView
 
         protected virtual void OnIndentChanged(int oldValue, int newValue)
         {
-            Margin = new Thickness(20 * newValue, 0, 0, 0);
+            Margin = new Thickness(15 * newValue, 0, 0, 0);
         }
 
         protected virtual void OnExpanderVisibilityChanged(Visibility visibility)

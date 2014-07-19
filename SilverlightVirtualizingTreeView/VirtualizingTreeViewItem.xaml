@@ -9,7 +9,7 @@
     
     <Grid x:Name="LayoutRoot" Margin="0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="15" />
+            <ColumnDefinition Width="12" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -62,7 +62,7 @@
                                 </vsm:VisualState>
                             </vsm:VisualStateGroup>
                         </vsm:VisualStateManager.VisualStateGroups>
-                        <Grid HorizontalAlignment="Right" Margin="2 2 5 2">
+                        <Grid HorizontalAlignment="Right" Margin="0,2,5,2">
                             <Path
                                 x:Name="UncheckedVisual"
                                 Width="6"
