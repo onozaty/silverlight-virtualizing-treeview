@@ -69,7 +69,6 @@
     <Compile Include="VirtualizingTreeViewItemData.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="LICENSE.txt" />
     <Page Include="VirtualizingTreeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
