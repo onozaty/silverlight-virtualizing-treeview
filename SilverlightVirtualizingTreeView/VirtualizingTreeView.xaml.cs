@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SilverlightVirtualizingTreeView
 {
@@ -123,6 +124,7 @@ namespace SilverlightVirtualizingTreeView
             InitializeComponent();
 
             AddHandler(KeyDownEvent, new KeyEventHandler(HandleKeyDown), true);
+            AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleMouseLeftButtonDown), true);
         }
 
         private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
@@ -253,6 +255,45 @@ namespace SilverlightVirtualizingTreeView
         {
             ((PagedCollectionView)InnerListBox.ItemsSource).Refresh();
         }
+
+        #region Double click handling
+        private VirtualizingTreeViewItemData _lastClickItem;
+        private DateTime _lastClickTime;
+
+        private void HandleMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var hitElements = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
+
+            ListBoxItem hitListBoxItem =
+                hitElements
+                    .Where(
+                        x => x is ListBoxItem
+                                && InnerListBox.ItemContainerGenerator.ItemFromContainer(x) != null)
+                    .FirstOrDefault() as ListBoxItem;
+
+            VirtualizingTreeViewItemData clickItem =
+                (hitListBoxItem != null)
+                    ? hitListBoxItem.Content as VirtualizingTreeViewItemData
+                    : null;
+
+            if (clickItem != null
+                && clickItem == _lastClickItem
+                && (DateTime.Now - _lastClickTime).TotalMilliseconds < 500)
+            {
+                clickItem.IsExpanded = !clickItem.IsExpanded;
+                SetFocus(clickItem);
+
+                _lastClickItem = null;
+                _lastClickTime = DateTime.MinValue;
+            }
+            else
+            {
+                _lastClickItem = clickItem;
+                _lastClickTime = DateTime.Now;
+            }
+        }
+
+        #endregion
 
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
