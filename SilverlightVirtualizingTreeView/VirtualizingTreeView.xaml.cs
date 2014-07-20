@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace SilverlightVirtualizingTreeView
 {
@@ -105,17 +106,23 @@ namespace SilverlightVirtualizingTreeView
             }
         }
 
-        public VirtualizingTreeViewItemData SelectedItemData
+        public VirtualizingTreeViewItemData SelectedItem
         {
             get
             {
-                return (VirtualizingTreeViewItemData)InnerListBox.SelectedValue;
+                return (VirtualizingTreeViewItemData)InnerListBox.SelectedItem;
+            }
+            set
+            {
+                InnerListBox.SelectedItem = value;
             }
         }
 
         public VirtualizingTreeView()
         {
             InitializeComponent();
+
+            AddHandler(KeyDownEvent, new KeyEventHandler(HandleKeyDown), true);
         }
 
         private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
@@ -247,5 +254,71 @@ namespace SilverlightVirtualizingTreeView
             ((PagedCollectionView)InnerListBox.ItemsSource).Refresh();
         }
 
+        private void HandleKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.OriginalSource as ListBoxItem == null)
+            {
+                return;
+            }
+
+            VirtualizingTreeViewItemData item =
+                (VirtualizingTreeViewItemData)((ListBoxItem)e.OriginalSource).Content;
+
+            if (item == null)
+            {
+                return;
+            }
+
+            switch (e.Key)
+            {
+                case Key.Left:
+
+                    if (item.ExpanderVisibility == Visibility.Visible
+                        && item.IsExpanded)
+                    {
+                        item.IsExpanded = false;
+                        SetFocus(item);
+                    }
+                    else
+                    {
+                        if (item.Parent != null)
+                        {
+                            SelectedItem = item.Parent;
+                        }
+                    }
+
+                    break;
+
+                case Key.Right:
+
+                    if (item.ExpanderVisibility == Visibility.Visible
+                        && !item.IsExpanded)
+                    {
+                        item.IsExpanded = true;
+                        SetFocus(item);
+                    }
+                    else
+                    {
+                        if (item.Children != null && item.Children.Count != 0)
+                        {
+                            SelectedItem = item.Children[0];
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        private void SetFocus(VirtualizingTreeViewItemData item)
+        {
+            InnerListBox.UpdateLayout();
+            ListBoxItem listBoxItem =
+                InnerListBox.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem;
+
+            if (listBoxItem != null)
+            {
+                listBoxItem.Focus();
+            }
+        }
     }
 }

@@ -30,7 +30,15 @@ namespace SampleApplication
                 Text = "Name2 (# of Children: 1)",
                 Children = new ObservableCollection<VirtualizingTreeViewItemData>() {
                     new VirtualizingTreeViewItemData() {
-                        Text = "Name2-1"
+                        Text = "Name2-1",
+                        Children = new ObservableCollection<VirtualizingTreeViewItemData>() {
+                            new VirtualizingTreeViewItemData() {
+                                Text = "Name2-1-1"
+                            },
+                            new VirtualizingTreeViewItemData() {
+                                Text = "Name2-1-2"
+                            }
+                        }
                     }
                 }
             });
@@ -46,7 +54,7 @@ namespace SampleApplication
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItemData;
+            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItem;
             if (selectedItemData != null)
             {
                 if (selectedItemData.Children == null)
@@ -63,7 +71,7 @@ namespace SampleApplication
 
         void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItemData;
+            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItem;
             if (selectedItemData != null)
             {
                 if (selectedItemData.Parent == null)
@@ -79,7 +87,7 @@ namespace SampleApplication
 
         private ObservableCollection<VirtualizingTreeViewItemData> CreateChildren(int count, string prefix)
         {
-            ObservableCollection<VirtualizingTreeViewItemData> children = 
+            ObservableCollection<VirtualizingTreeViewItemData> children =
                 new ObservableCollection<VirtualizingTreeViewItemData>();
 
             for (int i = 0; i < count; i++)
