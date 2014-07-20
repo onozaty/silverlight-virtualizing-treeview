@@ -22,12 +22,12 @@ namespace SampleApplication
 
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name1",
-                Children = CreateChildren(100, "Name1-")
+                Text = "Name1 (# of Children: 200)",
+                Children = CreateChildren(200, "Name1-")
             });
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name2",
+                Text = "Name2 (# of Children: 1)",
                 Children = new ObservableCollection<VirtualizingTreeViewItemData>() {
                     new VirtualizingTreeViewItemData() {
                         Text = "Name2-1"
@@ -36,7 +36,7 @@ namespace SampleApplication
             });
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name3",
+                Text = "Name3 (# of Children: 2000)",
                 Children = CreateChildren(2000, "Name3-")
             });
 

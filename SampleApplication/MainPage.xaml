@@ -6,7 +6,7 @@
     xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
     xmlns:custom="clr-namespace:SilverlightVirtualizingTreeView;assembly=SilverlightVirtualizingTreeView"
     x:Class="SampleApplication.MainPage"
-    mc:Ignorable="d" Height="301" Width="405">
+    mc:Ignorable="d" Height="363" Width="503">
     <UserControl.Resources>
         <sdk:HierarchicalDataTemplate x:Key="NameTemplate" 
                 ItemsSource="{Binding Path=Children}" >
@@ -15,11 +15,24 @@
     </UserControl.Resources>
 
     <Grid x:Name="LayoutRoot" Background="White" Margin="0,0,0,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <sdk:TreeView x:Name="treeView" HorizontalAlignment="Left" Height="247" Margin="10,10,0,0" VerticalAlignment="Top" Width="191" ItemTemplate="{StaticResource NameTemplate}"/>
-        <Button x:Name="addButton" Content="Add" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,90,10"/>
-        <Button x:Name="removeButton" Content="Remove" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="75" Margin="0,0,10,10"/>
-        <custom:VirtualizingTreeView x:Name="vTreeView" HorizontalAlignment="Left" Height="247" Margin="206,10,0,0" VerticalAlignment="Top" Width="189" />
+        <sdk:Label Content="TreeView" Margin="5"/>
+        <sdk:Label Content="VirtualizingTreeView" Grid.Column="1" Margin="5"/>
+
+        <sdk:TreeView x:Name="treeView" ItemTemplate="{StaticResource NameTemplate}" Grid.Row="1" Margin="5"/>
+        <custom:VirtualizingTreeView x:Name="vTreeView" Grid.Column="1" Grid.Row="1" Margin="5" />
+
+        <Button x:Name="addButton" Content="Add" Width="75" Grid.Row="2" Grid.Column="1" Margin="86,5,90,5"/>
+        <Button x:Name="removeButton" Content="Remove" Width="75" Grid.Row="2" Grid.Column="1" Margin="166,5,10,5"/>
 
     </Grid>
 </UserControl>
