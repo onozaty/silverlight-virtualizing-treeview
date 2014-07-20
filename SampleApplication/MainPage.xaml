@@ -25,7 +25,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <sdk:Label Content="TreeView" Margin="5"/>
+        <sdk:Label Content="Standard TreeView" Margin="5"/>
         <sdk:Label Content="VirtualizingTreeView" Grid.Column="1" Margin="5"/>
 
         <sdk:TreeView x:Name="treeView" ItemTemplate="{StaticResource NameTemplate}" Grid.Row="1" Margin="5"/>
