@@ -23,20 +23,6 @@ namespace SilverlightVirtualizingTreeView
             }
         }
 
-        private object _content;
-        public object Content
-        {
-            get { return _content; }
-            set
-            {
-                if (value != _content)
-                {
-                    _content = value;
-                    NotifyPropertyChanged("Content");
-                }
-            }
-        }
-
         public int Indent
         {
             get
@@ -147,7 +133,7 @@ namespace SilverlightVirtualizingTreeView
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(string propertyName)
+        protected void NotifyPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
             {

@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Net;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace SilverlightVirtualizingTreeView
 {
@@ -261,7 +256,7 @@ namespace SilverlightVirtualizingTreeView
                     break;
             }
 
-            ((PagedCollectionView)InnerListBox.ItemsSource).Refresh();
+            _itemsView.Refresh();
         }
 
         private int GetFlatItemIndex(VirtualizingTreeViewItemData parent, int startIndex)
@@ -311,7 +306,7 @@ namespace SilverlightVirtualizingTreeView
 
         private void Item_IsExpandedChanged(object sender, EventArgs e)
         {
-            ((PagedCollectionView)InnerListBox.ItemsSource).Refresh();
+            _itemsView.Refresh();
         }
 
         #region Double click handling
