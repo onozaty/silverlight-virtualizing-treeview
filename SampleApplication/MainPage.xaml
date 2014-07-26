@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <sdk:HierarchicalDataTemplate x:Key="NameTemplate" 
                 ItemsSource="{Binding Path=Children}" >
-            <TextBlock Text="{Binding Path=Text}" />
+            <TextBlock Text="{Binding Path=Content}" />
         </sdk:HierarchicalDataTemplate>
     </UserControl.Resources>
 

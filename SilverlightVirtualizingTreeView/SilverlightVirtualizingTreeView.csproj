@@ -63,9 +63,7 @@
     <Compile Include="VirtualizingTreeView.xaml.cs">
       <DependentUpon>VirtualizingTreeView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VirtualizingTreeViewItem.xaml.cs">
-      <DependentUpon>VirtualizingTreeViewItem.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="VirtualizingTreeViewItem.cs" />
     <Compile Include="VirtualizingTreeViewItemData.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,11 +71,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="VirtualizingTreeViewItem.xaml">
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>

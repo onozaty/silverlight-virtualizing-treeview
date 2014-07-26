@@ -14,7 +14,7 @@
                 <local:VirtualizingTreeViewItem
                         IsExpanded="{Binding Path=IsExpanded, Mode=TwoWay}" 
                         ExpanderVisibility="{Binding Path=ExpanderVisibility}" 
-                        Text="{Binding Path=Text}" 
+                        Content="{Binding Path=Content}" 
                         Indent="{Binding Path=Indent}"
                         HorizontalAlignment="Stretch" />
             </DataTemplate>

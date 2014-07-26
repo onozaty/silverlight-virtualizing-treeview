@@ -22,21 +22,21 @@ namespace SampleApplication
 
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name1 (# of Children: 200)",
+                Content = "Name1 (# of Children: 200)",
                 Children = CreateChildren(200, "Name1-")
             });
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name2 (# of Children: 1)",
+                Content = "Name2 (# of Children: 1)",
                 Children = new ObservableCollection<VirtualizingTreeViewItemData>() {
                     new VirtualizingTreeViewItemData() {
-                        Text = "Name2-1",
+                        Content = "Name2-1",
                         Children = new ObservableCollection<VirtualizingTreeViewItemData>() {
                             new VirtualizingTreeViewItemData() {
-                                Text = "Name2-1-1"
+                                Content = "Name2-1-1"
                             },
                             new VirtualizingTreeViewItemData() {
-                                Text = "Name2-1-2"
+                                Content = "Name2-1-2"
                             }
                         }
                     }
@@ -44,7 +44,7 @@ namespace SampleApplication
             });
             Datas.Add(new VirtualizingTreeViewItemData
             {
-                Text = "Name3 (# of Children: 2000)",
+                Content = "Name3 (# of Children: 2000)",
                 Children = CreateChildren(2000, "Name3-")
             });
 
@@ -64,7 +64,7 @@ namespace SampleApplication
 
                 selectedItemData.Children.Add(new VirtualizingTreeViewItemData()
                 {
-                    Text = "Add+" + DateTime.Now.ToString()
+                    Content = "Add+" + DateTime.Now.ToString()
                 });
             }
         }
@@ -94,7 +94,7 @@ namespace SampleApplication
             {
                 children.Add(new VirtualizingTreeViewItemData()
                 {
-                    Text = prefix + i
+                    Content = prefix + i
                 });
             }
 

@@ -1,9 +1,10 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 
 namespace SilverlightVirtualizingTreeView
 {
-    public partial class VirtualizingTreeViewItem : UserControl
+    public class VirtualizingTreeViewItem : ContentControl
     {
         #region IsExpanded
         public bool IsExpanded
@@ -32,28 +33,6 @@ namespace SilverlightVirtualizingTreeView
             {
                 source.OnCollapsed();
             }
-        }
-        #endregion
-
-        #region Text
-        public string Text
-        {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
-        }
-
-        public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register(
-                "Text",
-                typeof(string),
-                typeof(VirtualizingTreeViewItem),
-                new PropertyMetadata(null, OnTextPropertyChanged));
-
-        private static void OnTextPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
-
-            source.OnTextChanged((string)e.OldValue, (string)e.NewValue);
         }
         #endregion
 
@@ -101,11 +80,23 @@ namespace SilverlightVirtualizingTreeView
         }
         #endregion
 
-        public VirtualizingTreeViewItem()
-        {
-            InitializeComponent();
+        private ToggleButton ExpanderButton { get; set; }
 
+        public VirtualizingTreeViewItem()
+            : base()
+        {
+            DefaultStyleKey = typeof(VirtualizingTreeViewItem);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            // Get the parts
+            ExpanderButton = GetTemplateChild("ExpanderButton") as ToggleButton;
             ExpanderButton.Click += ExpanderButton_Click;
+            ExpanderButton.IsChecked = IsExpanded;
+            ExpanderButton.Visibility = ExpanderVisibility;
         }
 
         protected virtual void OnExpanded()
@@ -120,17 +111,15 @@ namespace SilverlightVirtualizingTreeView
 
         private void ToggleExpanded()
         {
-            ExpanderButton.IsChecked = IsExpanded;
+            if (ExpanderButton != null)
+            {
+                ExpanderButton.IsChecked = IsExpanded;
+            }
         }
 
         private void ExpanderButton_Click(object sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
-        }
-
-        protected virtual void OnTextChanged(string oldValue, string newValue)
-        {
-            ItemTextBlock.Text = newValue ?? string.Empty;
         }
 
         protected virtual void OnIndentChanged(int oldValue, int newValue)
@@ -140,7 +129,10 @@ namespace SilverlightVirtualizingTreeView
 
         protected virtual void OnExpanderVisibilityChanged(Visibility visibility)
         {
-            ExpanderButton.Visibility = visibility;
+            if (ExpanderButton != null)
+            {
+                ExpanderButton.Visibility = visibility;
+            }
         }
     }
 }

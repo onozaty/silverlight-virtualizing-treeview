@@ -2,15 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace SilverlightVirtualizingTreeView
 {
@@ -31,16 +23,16 @@ namespace SilverlightVirtualizingTreeView
             }
         }
 
-        private string _text;
-        public string Text
+        private object _content;
+        public object Content
         {
-            get { return _text; }
+            get { return _content; }
             set
             {
-                if (value != _text)
+                if (value != _content)
                 {
-                    _text = value;
-                    NotifyPropertyChanged("Text");
+                    _content = value;
+                    NotifyPropertyChanged("Content");
                 }
             }
         }
