@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 
 namespace SilverlightVirtualizingTreeView
 {
+    [TemplatePart(Name = VirtualizingTreeViewItem.ExpanderButtonName, Type = typeof(ToggleButton))]
     public class VirtualizingTreeViewItem : ContentControl
     {
         #region IsExpanded
@@ -80,6 +81,7 @@ namespace SilverlightVirtualizingTreeView
         }
         #endregion
 
+        private const string ExpanderButtonName = "ExpanderButton";
         private ToggleButton ExpanderButton { get; set; }
 
         public VirtualizingTreeViewItem()
