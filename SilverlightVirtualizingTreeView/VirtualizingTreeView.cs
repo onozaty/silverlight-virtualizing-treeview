@@ -1,17 +1,23 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Linq;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 
 namespace SilverlightVirtualizingTreeView
 {
-    public partial class VirtualizingTreeView : UserControl
+    [TemplatePart(Name = VirtualizingTreeView.InnerListBoxName, Type = typeof(ListBox))]
+    public class VirtualizingTreeView : Control
     {
         #region ItemsSource
         public IEnumerable<VirtualizingTreeViewItemData> ItemsSource
@@ -37,6 +43,35 @@ namespace SilverlightVirtualizingTreeView
                 (IEnumerable<VirtualizingTreeViewItemData>)e.NewValue);
         }
         #endregion
+
+        #region ItemTemplate
+        public DataTemplate ItemTemplate
+        {
+            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
+            set { SetValue(ItemTemplateProperty, value); }
+        }
+
+        public static readonly DependencyProperty ItemTemplateProperty =
+            DependencyProperty.Register(
+                "ItemTemplate",
+                typeof(DataTemplate),
+                typeof(VirtualizingTreeView),
+                new PropertyMetadata(null, OnItemTemplatePropertyChanged));
+
+        private static void OnItemTemplatePropertyChanged(
+            DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            VirtualizingTreeView source = d as VirtualizingTreeView;
+
+            source.OnItemTemplateChanged(
+                (DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
+        }
+        #endregion
+
+        private const string InnerListBoxName = "InnerListBox";
+        private ListBox InnerListBox { get; set; }
+
+        private PagedCollectionView _itemsView;
 
         private ObservableCollection<VirtualizingTreeViewItemData> _flatItems;
 
@@ -70,9 +105,21 @@ namespace SilverlightVirtualizingTreeView
                 newCollection.CollectionChanged += ItemsSource_CollectionChanged;
             }
 
-            PagedCollectionView collectionView = new PagedCollectionView(_flatItems);
-            collectionView.Filter = FilterItems;
-            InnerListBox.ItemsSource = collectionView;
+            _itemsView = new PagedCollectionView(_flatItems);
+            _itemsView.Filter = FilterItems;
+
+            if (InnerListBox != null)
+            {
+                InnerListBox.ItemsSource = _itemsView;
+            }
+        }
+
+        protected virtual void OnItemTemplateChanged(DataTemplate oldValue, DataTemplate newValue)
+        {
+            if (InnerListBox != null)
+            {
+                InnerListBox.ItemTemplate = newValue;
+            }
         }
 
         private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -120,11 +167,22 @@ namespace SilverlightVirtualizingTreeView
         }
 
         public VirtualizingTreeView()
+            : base()
         {
-            InitializeComponent();
+            DefaultStyleKey = typeof(VirtualizingTreeView);
 
             AddHandler(KeyDownEvent, new KeyEventHandler(HandleKeyDown), true);
             AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleMouseLeftButtonDown), true);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            // Get the parts
+            InnerListBox = GetTemplateChild(InnerListBoxName) as ListBox;
+            InnerListBox.ItemTemplate = ItemTemplate;
+            InnerListBox.ItemsSource = _itemsView;
         }
 
         private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(

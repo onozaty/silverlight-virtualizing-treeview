@@ -95,7 +95,7 @@ namespace SilverlightVirtualizingTreeView
             base.OnApplyTemplate();
 
             // Get the parts
-            ExpanderButton = GetTemplateChild("ExpanderButton") as ToggleButton;
+            ExpanderButton = GetTemplateChild(ExpanderButtonName) as ToggleButton;
             ExpanderButton.Click += ExpanderButton_Click;
             ExpanderButton.IsChecked = IsExpanded;
             ExpanderButton.Visibility = ExpanderVisibility;
