@@ -114,7 +114,7 @@ namespace Silverlight.VirtualizingTreeView
             }
         }
 
-        void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Children_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {

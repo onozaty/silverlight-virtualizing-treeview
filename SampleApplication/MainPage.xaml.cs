@@ -54,7 +54,7 @@ namespace SampleApplication
             vTreeViewCheckBox.ItemsSource = Datas;
         }
 
-        void AddButton_Click(object sender, RoutedEventArgs e)
+        private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             VirtualizingTreeViewItemData selectedItemData = vTreeViewCheckBox.SelectedItem;
             if (selectedItemData != null)
@@ -71,7 +71,7 @@ namespace SampleApplication
             }
         }
 
-        void RemoveButton_Click(object sender, RoutedEventArgs e)
+        private void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
             VirtualizingTreeViewItemData selectedItemData = vTreeViewCheckBox.SelectedItem;
             if (selectedItemData != null)
