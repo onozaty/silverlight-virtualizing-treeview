@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 
-namespace SilverlightVirtualizingTreeView
+namespace Silverlight.VirtualizingTreeView
 {
     public class VirtualizingTreeViewItemData : INotifyPropertyChanged
     {

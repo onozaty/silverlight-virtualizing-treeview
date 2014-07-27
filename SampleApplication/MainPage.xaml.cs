@@ -1,4 +1,4 @@
-﻿using SilverlightVirtualizingTreeView;
+﻿using Silverlight.VirtualizingTreeView;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;

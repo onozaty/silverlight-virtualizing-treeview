@@ -10,7 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace SilverlightVirtualizingTreeView
+namespace Silverlight.VirtualizingTreeView
 {
     [TemplatePart(Name = VirtualizingTreeView.InnerListBoxName, Type = typeof(ListBox))]
     public class VirtualizingTreeView : Control

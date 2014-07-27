@@ -1,5 +1,5 @@
 ﻿
-namespace SilverlightVirtualizingTreeView
+namespace Silverlight.VirtualizingTreeView
 {
     public class VirtualizingTreeViewItemBasicData : VirtualizingTreeViewItemData
     {

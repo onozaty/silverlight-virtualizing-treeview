@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace SilverlightVirtualizingTreeView
+namespace Silverlight.VirtualizingTreeView
 {
     [TemplatePart(Name = VirtualizingTreeViewItem.ExpanderButtonName, Type = typeof(ToggleButton))]
     [TemplatePart(Name = VirtualizingTreeViewItem.ItemCheckBoxName, Type = typeof(CheckBox))]

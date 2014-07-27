@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace SilverlightVirtualizingTreeView
+namespace Silverlight.VirtualizingTreeView
 {
     public class ChildrenChangedEventArgs : EventArgs
     {
