@@ -23,7 +23,8 @@ namespace SampleApplication
             Datas.Add(new VirtualizingTreeViewItemBasicData
             {
                 Content = "Name1 (# of Children: 200)",
-                Children = CreateChildren(200, "Name1-")
+                Children = CreateChildren(200, "Name1-"),
+                IsChecked = true
             });
             Datas.Add(new VirtualizingTreeViewItemBasicData
             {
@@ -50,11 +51,12 @@ namespace SampleApplication
 
             treeView.ItemsSource = Datas;
             vTreeView.ItemsSource = Datas;
+            vTreeViewCheckBox.ItemsSource = Datas;
         }
 
         void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItem;
+            VirtualizingTreeViewItemData selectedItemData = vTreeViewCheckBox.SelectedItem;
             if (selectedItemData != null)
             {
                 if (selectedItemData.Children == null)
@@ -71,7 +73,7 @@ namespace SampleApplication
 
         void RemoveButton_Click(object sender, RoutedEventArgs e)
         {
-            VirtualizingTreeViewItemData selectedItemData = vTreeView.SelectedItem;
+            VirtualizingTreeViewItemData selectedItemData = vTreeViewCheckBox.SelectedItem;
             if (selectedItemData != null)
             {
                 if (selectedItemData.Parent == null)

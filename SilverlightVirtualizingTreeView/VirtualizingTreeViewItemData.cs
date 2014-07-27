@@ -53,6 +53,20 @@ namespace SilverlightVirtualizingTreeView
             }
         }
 
+        private bool _isChecked;
+        public bool IsChecked
+        {
+            get { return _isChecked; }
+            set
+            {
+                if (value != _isChecked)
+                {
+                    _isChecked = value;
+                    NotifyPropertyChanged("IsChecked");
+                }
+            }
+        }
+
         private VirtualizingTreeViewItemData _parent;
         public VirtualizingTreeViewItemData Parent
         {

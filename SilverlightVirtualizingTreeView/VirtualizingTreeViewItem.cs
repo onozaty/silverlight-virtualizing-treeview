@@ -1,10 +1,12 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
 namespace SilverlightVirtualizingTreeView
 {
     [TemplatePart(Name = VirtualizingTreeViewItem.ExpanderButtonName, Type = typeof(ToggleButton))]
+    [TemplatePart(Name = VirtualizingTreeViewItem.ItemCheckBoxName, Type = typeof(CheckBox))]
     public class VirtualizingTreeViewItem : ContentControl
     {
         #region IsExpanded
@@ -49,14 +51,61 @@ namespace SilverlightVirtualizingTreeView
                 "ExpanderVisibility",
                 typeof(Visibility),
                 typeof(VirtualizingTreeViewItem),
-                new PropertyMetadata(Visibility.Visible, OnExpanderVisibilityPropertyChanged));
+                new PropertyMetadata(Visibility.Visible, null));
 
-        private static void OnExpanderVisibilityPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        #endregion
+
+        #region CheckBoxType
+
+        public enum CheckBoxTypes
+        {
+            None,
+            Single,
+            RefrectCheckChild
+        }
+
+        public CheckBoxTypes CheckBoxType
+        {
+            get { return (CheckBoxTypes)GetValue(CheckBoxTypeProperty); }
+            set { SetValue(CheckBoxTypeProperty, value); }
+        }
+
+        public static readonly DependencyProperty CheckBoxTypeProperty =
+            DependencyProperty.Register(
+                "CheckBoxType",
+                typeof(CheckBoxTypes),
+                typeof(VirtualizingTreeViewItem),
+                new PropertyMetadata(CheckBoxTypes.None, null));
+
+        private static void OnCheckBoxTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
 
-            source.OnExpanderVisibilityChanged((Visibility)e.NewValue);
+            source.OnCheckBoxTypeChanged((CheckBoxTypes)e.NewValue);
         }
+
+        #endregion
+
+        #region IsChecked
+        public bool IsChecked
+        {
+            get { return (bool)GetValue(IsCheckedProperty); }
+            set { SetValue(IsCheckedProperty, value); }
+        }
+
+        public static readonly DependencyProperty IsCheckedProperty =
+            DependencyProperty.Register(
+                "IsChecked",
+                typeof(bool),
+                typeof(VirtualizingTreeViewItem),
+                new PropertyMetadata(false, OnIsCheckedPropertyChanged));
+
+        private static void OnIsCheckedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
+            source.OnIsCheckedChanged((bool)e.NewValue);
+        }
+
         #endregion
 
         #region Indent
@@ -84,6 +133,9 @@ namespace SilverlightVirtualizingTreeView
         private const string ExpanderButtonName = "ExpanderButton";
         private ToggleButton ExpanderButton { get; set; }
 
+        private const string ItemCheckBoxName = "ItemCheckBox";
+        private CheckBox ItemCheckBox { get; set; }
+
         public VirtualizingTreeViewItem()
             : base()
         {
@@ -98,7 +150,14 @@ namespace SilverlightVirtualizingTreeView
             ExpanderButton = GetTemplateChild(ExpanderButtonName) as ToggleButton;
             ExpanderButton.Click += ExpanderButton_Click;
             ExpanderButton.IsChecked = IsExpanded;
-            ExpanderButton.Visibility = ExpanderVisibility;
+
+            ItemCheckBox = GetTemplateChild(ItemCheckBoxName) as CheckBox;
+            ItemCheckBox.Click += ItemCheckBox_Click;
+            ItemCheckBox.IsChecked = IsChecked;
+            ItemCheckBox.Visibility =
+                (CheckBoxType == CheckBoxTypes.None)
+                    ? Visibility.Collapsed
+                    : Visibility.Visible;
         }
 
         protected virtual void OnExpanded()
@@ -124,17 +183,63 @@ namespace SilverlightVirtualizingTreeView
             IsExpanded = !IsExpanded;
         }
 
+        protected virtual void OnIsCheckedChanged(bool newValue)
+        {
+            if (ItemCheckBox != null)
+            {
+                ItemCheckBox.IsChecked = newValue;
+            }
+        }
+
+        protected virtual void OnCheckBoxTypeChanged(CheckBoxTypes newValue)
+        {
+            if (ItemCheckBox != null)
+            {
+                ItemCheckBox.Visibility = 
+                    (newValue == CheckBoxTypes.None)
+                        ? Visibility.Collapsed
+                        : Visibility.Visible;
+            }
+        }
+
+        private void ItemCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            IsChecked = !IsChecked;
+
+            if (CheckBoxType == CheckBoxTypes.RefrectCheckChild)
+            {
+                VirtualizingTreeViewItemData itemData = this.DataContext as VirtualizingTreeViewItemData;
+
+                foreach (var item in FlattenItems(itemData.Children))
+                {
+                    item.IsChecked = IsChecked;
+                }
+            }
+        }
+
         protected virtual void OnIndentChanged(int oldValue, int newValue)
         {
             Margin = new Thickness(15 * newValue, 0, 0, 0);
         }
 
-        protected virtual void OnExpanderVisibilityChanged(Visibility visibility)
+        private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
+            IEnumerable<VirtualizingTreeViewItemData> children)
         {
-            if (ExpanderButton != null)
+            if (children == null)
             {
-                ExpanderButton.Visibility = visibility;
+                yield break;
+            }
+
+            foreach (var child in children)
+            {
+                yield return child;
+
+                foreach (VirtualizingTreeViewItemData grandchild in FlattenItems(child.Children))
+                {
+                    yield return grandchild;
+                }
             }
         }
+
     }
 }
