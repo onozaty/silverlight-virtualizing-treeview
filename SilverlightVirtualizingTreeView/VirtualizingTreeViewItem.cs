@@ -25,17 +25,8 @@ namespace Silverlight.VirtualizingTreeView
 
         private static void OnIsExpandedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
-            bool isExpanded = (bool)e.NewValue;
-
-            if (isExpanded)
-            {
-                source.OnExpanded();
-            }
-            else
-            {
-                source.OnCollapsed();
-            }
+            VirtualizingTreeViewItem treeViewItem = d as VirtualizingTreeViewItem;
+            treeViewItem.ToggleExpanded();
         }
         #endregion
 
@@ -52,11 +43,9 @@ namespace Silverlight.VirtualizingTreeView
                 typeof(Visibility),
                 typeof(VirtualizingTreeViewItem),
                 new PropertyMetadata(Visibility.Visible, null));
-
         #endregion
 
         #region CheckBoxType
-
         public enum CheckBoxTypes
         {
             None,
@@ -79,11 +68,9 @@ namespace Silverlight.VirtualizingTreeView
 
         private static void OnCheckBoxTypePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
-
-            source.OnCheckBoxTypeChanged((CheckBoxTypes)e.NewValue);
+            VirtualizingTreeViewItem treeViewItem = d as VirtualizingTreeViewItem;
+            treeViewItem.ChangeCheckBoxVisibility();
         }
-
         #endregion
 
         #region IsChecked
@@ -102,10 +89,13 @@ namespace Silverlight.VirtualizingTreeView
 
         private static void OnIsCheckedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
-            source.OnIsCheckedChanged((bool)e.NewValue);
-        }
+            VirtualizingTreeViewItem treeViewItem = d as VirtualizingTreeViewItem;
 
+            if (treeViewItem.ItemCheckBox != null)
+            {
+                treeViewItem.ItemCheckBox.IsChecked = (bool)e.NewValue;
+            }
+        }
         #endregion
 
         #region Indent
@@ -124,9 +114,8 @@ namespace Silverlight.VirtualizingTreeView
 
         private static void OnIndentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeViewItem source = d as VirtualizingTreeViewItem;
-
-            source.OnIndentChanged((int)e.OldValue, (int)e.NewValue);
+            VirtualizingTreeViewItem treeViewItem = d as VirtualizingTreeViewItem;
+            treeViewItem.ApplyControlIndent();
         }
         #endregion
 
@@ -149,57 +138,18 @@ namespace Silverlight.VirtualizingTreeView
             // Get the parts
             ExpanderButton = GetTemplateChild(ExpanderButtonName) as ToggleButton;
             ExpanderButton.Click += ExpanderButton_Click;
-            ExpanderButton.IsChecked = IsExpanded;
-
+            
             ItemCheckBox = GetTemplateChild(ItemCheckBoxName) as CheckBox;
             ItemCheckBox.Click += ItemCheckBox_Click;
             ItemCheckBox.IsChecked = IsChecked;
-            ItemCheckBox.Visibility =
-                (CheckBoxType == CheckBoxTypes.None)
-                    ? Visibility.Collapsed
-                    : Visibility.Visible;
-        }
 
-        protected virtual void OnExpanded()
-        {
             ToggleExpanded();
-        }
-
-        protected virtual void OnCollapsed()
-        {
-            ToggleExpanded();
-        }
-
-        private void ToggleExpanded()
-        {
-            if (ExpanderButton != null)
-            {
-                ExpanderButton.IsChecked = IsExpanded;
-            }
+            ChangeCheckBoxVisibility();
         }
 
         private void ExpanderButton_Click(object sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
-        }
-
-        protected virtual void OnIsCheckedChanged(bool newValue)
-        {
-            if (ItemCheckBox != null)
-            {
-                ItemCheckBox.IsChecked = newValue;
-            }
-        }
-
-        protected virtual void OnCheckBoxTypeChanged(CheckBoxTypes newValue)
-        {
-            if (ItemCheckBox != null)
-            {
-                ItemCheckBox.Visibility = 
-                    (newValue == CheckBoxTypes.None)
-                        ? Visibility.Collapsed
-                        : Visibility.Visible;
-            }
         }
 
         private void ItemCheckBox_Click(object sender, RoutedEventArgs e)
@@ -209,37 +159,32 @@ namespace Silverlight.VirtualizingTreeView
             if (CheckBoxType == CheckBoxTypes.RefrectCheckChild)
             {
                 VirtualizingTreeViewItemData itemData = this.DataContext as VirtualizingTreeViewItemData;
-
-                foreach (var item in FlattenItems(itemData.Children))
-                {
-                    item.IsChecked = IsChecked;
-                }
+                itemData.CheckChildren(IsChecked);
             }
         }
 
-        protected virtual void OnIndentChanged(int oldValue, int newValue)
+        private void ToggleExpanded()
         {
-            Margin = new Thickness(15 * newValue, 0, 0, 0);
+            if (ExpanderButton != null)
+            {
+               ExpanderButton.IsChecked = IsExpanded;
+            }
         }
 
-        private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
-            IEnumerable<VirtualizingTreeViewItemData> children)
+        private void ChangeCheckBoxVisibility()
         {
-            if (children == null)
+            if (ItemCheckBox != null)
             {
-                yield break;
-            }
-
-            foreach (var child in children)
-            {
-                yield return child;
-
-                foreach (VirtualizingTreeViewItemData grandchild in FlattenItems(child.Children))
-                {
-                    yield return grandchild;
-                }
+                ItemCheckBox.Visibility =
+                    (CheckBoxType == CheckBoxTypes.None)
+                        ? Visibility.Collapsed
+                        : Visibility.Visible;
             }
         }
 
+        private void ApplyControlIndent()
+        {
+            Margin = new Thickness(15 * Indent, 0, 0, 0);
+        }
     }
 }

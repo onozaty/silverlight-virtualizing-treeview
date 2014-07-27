@@ -32,11 +32,11 @@ namespace Silverlight.VirtualizingTreeView
         private static void OnItemsSourcePropertyChanged(
             DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeView source = d as VirtualizingTreeView;
+            VirtualizingTreeView treeView = d as VirtualizingTreeView;
 
-            source.OnItemsSourceChanged(
-                (IEnumerable<VirtualizingTreeViewItemData>)e.OldValue,
-                (IEnumerable<VirtualizingTreeViewItemData>)e.NewValue);
+            treeView.InitTreeViewItemsSource(
+                (IEnumerable<VirtualizingTreeViewItemData>)e.NewValue,
+                (IEnumerable<VirtualizingTreeViewItemData>)e.OldValue);
         }
         #endregion
 
@@ -57,10 +57,12 @@ namespace Silverlight.VirtualizingTreeView
         private static void OnItemTemplatePropertyChanged(
             DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            VirtualizingTreeView source = d as VirtualizingTreeView;
+            VirtualizingTreeView treeView = d as VirtualizingTreeView;
 
-            source.OnItemTemplateChanged(
-                (DataTemplate)e.OldValue, (DataTemplate)e.NewValue);
+            if (treeView.InnerListBox != null)
+            {
+                treeView.InnerListBox.ItemTemplate = (DataTemplate)e.NewValue;
+            }
         }
         #endregion
 
@@ -71,34 +73,60 @@ namespace Silverlight.VirtualizingTreeView
 
         private ObservableCollection<VirtualizingTreeViewItemData> _flatItems;
 
-        protected virtual void OnItemsSourceChanged(
-            IEnumerable<VirtualizingTreeViewItemData> oldValue, IEnumerable<VirtualizingTreeViewItemData> newValue)
+        public VirtualizingTreeViewItemData SelectedItem
         {
+            get
+            {
+                return (VirtualizingTreeViewItemData)InnerListBox.SelectedItem;
+            }
+            set
+            {
+                InnerListBox.SelectedItem = value;
+            }
+        }
+
+        public VirtualizingTreeView()
+            : base()
+        {
+            DefaultStyleKey = typeof(VirtualizingTreeView);
+
+            AddHandler(
+                KeyDownEvent, new KeyEventHandler(HandleKeyDown), true);
+            AddHandler(
+                MouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleMouseLeftButtonDown), true);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            // Get the parts
+            InnerListBox = GetTemplateChild(InnerListBoxName) as ListBox;
+            InnerListBox.ItemTemplate = ItemTemplate;
+            InnerListBox.ItemsSource = _itemsView;
+        }
+
+        private void InitTreeViewItemsSource(
+            IEnumerable<VirtualizingTreeViewItemData> newItemsSource,
+            IEnumerable<VirtualizingTreeViewItemData> oldItemsSource)
+        {
+            if (_flatItems != null)
+            {
+                foreach (VirtualizingTreeViewItemData oldItem in _flatItems)
+                {
+                    oldItem.ChildrenChanged -= Item_ChildrenChanged;
+                    oldItem.IsExpandedChanged -= Item_IsExpandedChanged;
+                }
+            }
+
             _flatItems = new ObservableCollection<VirtualizingTreeViewItemData>();
 
-            foreach (VirtualizingTreeViewItemData item in FlattenItems(null, newValue))
+            foreach (VirtualizingTreeViewItemData item in FlattenItems(null, newItemsSource))
             {
-                item.ChildrenChanged -= Item_ChildrenChanged;
                 item.ChildrenChanged += Item_ChildrenChanged;
-
-                item.IsExpandedChanged -= Item_IsExpandedChanged;
                 item.IsExpandedChanged += Item_IsExpandedChanged;
 
                 _flatItems.Add(item);
-            }
-
-            INotifyCollectionChanged oldCollection = oldValue as INotifyCollectionChanged;
-            INotifyCollectionChanged newCollection = newValue as INotifyCollectionChanged;
-
-            if (oldCollection != null)
-            {
-                oldCollection.CollectionChanged -= ItemsSource_CollectionChanged;
-            }
-
-            if (newCollection != null)
-            {
-                newCollection.CollectionChanged -= ItemsSource_CollectionChanged;
-                newCollection.CollectionChanged += ItemsSource_CollectionChanged;
             }
 
             _itemsView = new PagedCollectionView(_flatItems);
@@ -108,16 +136,23 @@ namespace Silverlight.VirtualizingTreeView
             {
                 InnerListBox.ItemsSource = _itemsView;
             }
-        }
 
-        protected virtual void OnItemTemplateChanged(DataTemplate oldValue, DataTemplate newValue)
-        {
-            if (InnerListBox != null)
+
+            INotifyCollectionChanged oldCollection = oldItemsSource as INotifyCollectionChanged;
+            INotifyCollectionChanged newCollection = newItemsSource as INotifyCollectionChanged;
+
+            if (oldCollection != null)
             {
-                InnerListBox.ItemTemplate = newValue;
+                oldCollection.CollectionChanged -= ItemsSource_CollectionChanged;
+            }
+
+            if (newCollection != null)
+            {
+                newCollection.CollectionChanged += ItemsSource_CollectionChanged;
             }
         }
 
+        #region handling items change
         private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -148,63 +183,6 @@ namespace Silverlight.VirtualizingTreeView
 
                     break;
             }
-        }
-
-        public VirtualizingTreeViewItemData SelectedItem
-        {
-            get
-            {
-                return (VirtualizingTreeViewItemData)InnerListBox.SelectedItem;
-            }
-            set
-            {
-                InnerListBox.SelectedItem = value;
-            }
-        }
-
-        public VirtualizingTreeView()
-            : base()
-        {
-            DefaultStyleKey = typeof(VirtualizingTreeView);
-
-            AddHandler(KeyDownEvent, new KeyEventHandler(HandleKeyDown), true);
-            AddHandler(MouseLeftButtonDownEvent, new MouseButtonEventHandler(HandleMouseLeftButtonDown), true);
-        }
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            // Get the parts
-            InnerListBox = GetTemplateChild(InnerListBoxName) as ListBox;
-            InnerListBox.ItemTemplate = ItemTemplate;
-            InnerListBox.ItemsSource = _itemsView;
-        }
-
-        private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
-            VirtualizingTreeViewItemData parent, IEnumerable<VirtualizingTreeViewItemData> children)
-        {
-            if (children == null)
-            {
-                yield break;
-            }
-
-            foreach (var child in children)
-            {
-                child.Parent = parent;
-
-                yield return child;
-
-                foreach (VirtualizingTreeViewItemData grandchild in FlattenItems(child, child.Children))
-                {
-                    yield return grandchild;
-                }
-            }
-        }
-
-        private bool FilterItems(object obj)
-        {
-            return ((VirtualizingTreeViewItemData)obj).IsParentExpanded;
         }
 
         private void Item_ChildrenChanged(object sender, ChildrenChangedEventArgs e)
@@ -260,34 +238,11 @@ namespace Silverlight.VirtualizingTreeView
             _itemsView.Refresh();
         }
 
-        private int GetFlatItemIndex(VirtualizingTreeViewItemData parent, int startIndex)
-        {
-            if (startIndex == 0)
-            {
-                return _flatItems.IndexOf(parent) + 1;
-            }
-
-            return _flatItems.IndexOf(GetLastChild(parent.Children[startIndex - 1])) + 1;
-        }
-
-        private VirtualizingTreeViewItemData GetLastChild(VirtualizingTreeViewItemData child)
-        {
-            if (child.Children == null || child.Children.Count == 0)
-            {
-                return child;
-            }
-
-            return GetLastChild(child.Children.Last());
-        }
-
         private void AddFlatItems(int startIndex, IEnumerable<VirtualizingTreeViewItemData> items)
         {
             foreach (VirtualizingTreeViewItemData item in items)
             {
-                item.ChildrenChanged -= Item_ChildrenChanged;
                 item.ChildrenChanged += Item_ChildrenChanged;
-
-                item.IsExpandedChanged -= Item_IsExpandedChanged;
                 item.IsExpandedChanged += Item_IsExpandedChanged;
 
                 _flatItems.Insert(startIndex++, item);
@@ -305,6 +260,53 @@ namespace Silverlight.VirtualizingTreeView
             }
         }
 
+        private int GetFlatItemIndex(VirtualizingTreeViewItemData parent, int childIndex)
+        {
+            if (childIndex == 0)
+            {
+                return _flatItems.IndexOf(parent) + 1;
+            }
+
+            return _flatItems.IndexOf(GetLastChild(parent.Children[childIndex - 1])) + 1;
+        }
+
+        private VirtualizingTreeViewItemData GetLastChild(VirtualizingTreeViewItemData child)
+        {
+            if (child.Children == null || child.Children.Count == 0)
+            {
+                return child;
+            }
+
+            return GetLastChild(child.Children.Last());
+        }
+        #endregion
+
+        private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
+            VirtualizingTreeViewItemData parent, IEnumerable<VirtualizingTreeViewItemData> children)
+        {
+            if (children == null)
+            {
+                yield break;
+            }
+
+            foreach (var child in children)
+            {
+                child.Parent = parent;
+
+                yield return child;
+
+                foreach (VirtualizingTreeViewItemData grandchild in FlattenItems(child, child.Children))
+                {
+                    yield return grandchild;
+                }
+            }
+        }
+
+        private bool FilterItems(object obj)
+        {
+            return ((VirtualizingTreeViewItemData)obj).IsParentExpanded;
+        }
+
         private void Item_IsExpandedChanged(object sender, EventArgs e)
         {
             _itemsView.Refresh();
@@ -316,7 +318,8 @@ namespace Silverlight.VirtualizingTreeView
 
         private void HandleMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var hitElements = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
+            IEnumerable<UIElement> hitElements =
+                VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
 
             VirtualizingTreeViewItemData clickItem = null;
 
@@ -352,9 +355,9 @@ namespace Silverlight.VirtualizingTreeView
                 _lastClickTime = DateTime.Now;
             }
         }
-
         #endregion
 
+        #region keyboard operation
         private void HandleKeyDown(object sender, KeyEventArgs e)
         {
             if (e.OriginalSource as ListBoxItem == null)
@@ -409,6 +412,7 @@ namespace Silverlight.VirtualizingTreeView
                     break;
             }
         }
+        #endregion
 
         private void SetFocus(VirtualizingTreeViewItemData item)
         {

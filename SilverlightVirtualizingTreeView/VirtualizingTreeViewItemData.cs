@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -181,6 +182,33 @@ namespace Silverlight.VirtualizingTreeView
             {
                 return Parent == null
                     || (Parent.IsExpanded && Parent.IsParentExpanded);
+            }
+        }
+
+        public void CheckChildren(bool isChecked)
+        {
+            foreach (var item in FlattenItems(Children))
+            {
+                item.IsChecked = IsChecked;
+            }
+        }
+
+        private IEnumerable<VirtualizingTreeViewItemData> FlattenItems(
+            IEnumerable<VirtualizingTreeViewItemData> children)
+        {
+            if (children == null)
+            {
+                yield break;
+            }
+
+            foreach (var child in children)
+            {
+                yield return child;
+
+                foreach (VirtualizingTreeViewItemData grandchild in FlattenItems(child.Children))
+                {
+                    yield return grandchild;
+                }
             }
         }
     }
