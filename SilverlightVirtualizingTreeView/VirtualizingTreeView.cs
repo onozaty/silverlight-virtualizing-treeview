@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -317,17 +318,23 @@ namespace SilverlightVirtualizingTreeView
         {
             var hitElements = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
 
-            ListBoxItem hitListBoxItem =
-                hitElements
-                    .Where(
-                        x => x is ListBoxItem
-                                && InnerListBox.ItemContainerGenerator.ItemFromContainer(x) != null)
-                    .FirstOrDefault() as ListBoxItem;
+            VirtualizingTreeViewItemData clickItem = null;
 
-            VirtualizingTreeViewItemData clickItem =
-                (hitListBoxItem != null)
-                    ? hitListBoxItem.Content as VirtualizingTreeViewItemData
-                    : null;
+            // excluded CheckBox and Expander
+            if (!hitElements.Any(x => x is ToggleButton))
+            {
+                ListBoxItem hitListBoxItem =
+                    hitElements
+                        .Where(
+                            x => x is ListBoxItem
+                                    && InnerListBox.ItemContainerGenerator.ItemFromContainer(x) != null)
+                        .FirstOrDefault() as ListBoxItem;
+
+                clickItem =
+                    (hitListBoxItem != null)
+                        ? hitListBoxItem.Content as VirtualizingTreeViewItemData
+                        : null;
+            }
 
             if (clickItem != null
                 && clickItem == _lastClickItem
